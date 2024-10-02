@@ -128,7 +128,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
 
             when (page) {
                 0 -> HomeScreen()
-                1 -> ChatBotScreen(expenses = state.expenselist)
+                1 -> ChatBotScreen(expenses = expenses)
                 2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
             }
         }

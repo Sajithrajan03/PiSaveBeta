@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class BakingViewModel : ViewModel() {
+open class BakingViewModel : ViewModel() {
 
 
     private fun getColorForCategory(category: String): Color {
@@ -95,7 +95,7 @@ class BakingViewModel : ViewModel() {
             "note: ${expense.note}, Amount: ${expense.currency}${expense.amount}, Date: ${expense.date}"
         }
 
-        val fullPrompt = "You are a personal financial adviser who enables the user to talk to their money and respond with some emojies. Keep your responses short while providing upto the point, concise and valuable insights. Below is the prompt given by the user:\n$prompt\n\nHere is the expense list:\n$expenseListString"
+        val fullPrompt = "You are a personal financial adviser who enables the user to talk to their money and respond friendly and professionally. Keep your responses short while providing upto the point, concise and valuable insights. Below is the prompt given by the user:\n$prompt\n\nHere is the expense list:\n$expenseListString"
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -118,6 +118,7 @@ class BakingViewModel : ViewModel() {
                                 text(fullPrompt)
                             }
                         )
+
                         response.text?.let { outputContent ->
                             _uiState.value = UiState.Success(outputContent)
                         } ?: run {

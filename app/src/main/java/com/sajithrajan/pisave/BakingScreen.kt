@@ -1,6 +1,9 @@
 package com.sajithrajan.pisave
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +15,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +31,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.yml.charts.common.components.Legends
 import co.yml.charts.common.utils.DataUtils
@@ -38,20 +48,20 @@ import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.sajithrajan.pisave.dataBase.Expense
-import com.sajithrajan.pisave.ui.theme.NavyBlue
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
-
 // Composable function for the chatbot screen
+
+
 @Composable
 fun ChatBotScreen(
     bakingViewModel: BakingViewModel = viewModel(), // ViewModel
-    expenses: List<Expense> // Passing the list of expenses
+    expenses: SnapshotStateList<Expense>,
 ) {
     val promptText = remember { mutableStateOf(TextFieldValue("")) } // TextField state
     val conversationList = remember { mutableStateListOf<String>() } // Conversation history
     val uiState by bakingViewModel.uiState.collectAsState() // UI state from ViewModel
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,22 +71,58 @@ fun ChatBotScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+
         ) {
             items(conversationList) { message ->
                 if (message.startsWith("AI: ")) {
-                    // Extract the markdown content from the message
-                    val markdownContent = message
-                    MarkdownText(markdown = markdownContent, modifier = Modifier.padding(vertical = 4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start // Align AI messages to the start (left)
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Black,
+                            ),
+                            modifier = Modifier
+                                .padding(5.dp)
+                        ) {
+                            MarkdownText(
+                                markdown = message, // AI's message
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
                 } else {
-                    Text(
-                        text = message,
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    // User's message aligned to the right
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End // Align user messages to the end (right)
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF0C6E63),
+                            ),
+                            modifier = Modifier
+                                .padding(5.dp)
+                        ) {
+                            Text(
+                                text = message,
+                                modifier = Modifier
+                                    .padding(10.dp),
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                ),
+                            )
+                        }
+                    }
                 }
-
-                HorizontalDivider(thickness = 1.dp, modifier = Modifier.fillMaxWidth(), color = Color.White)
             }
         }
 
@@ -89,50 +135,65 @@ fun ChatBotScreen(
         }
 
         // User prompt input and send button
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Color(0xFF26292D) // Background color
+            )// Clip content to rounded corners
+            .border(1.dp, Color(0xFF9860E4), MaterialTheme.shapes.large) // Add the border
+            .padding(vertical = 4.dp) // Inner padding
+            .padding(horizontal = 10.dp)
+            .padding(start=16.dp)// Horizontal padding for content
+            .height(60.dp)
+
+
+        ) {
             BasicTextField(
                 value = promptText.value,
                 onValueChange = { promptText.value = it },
-                modifier = Modifier.background(
-                    NavyBlue)
-                    .height(100.dp)
-                    .weight(1f)
-                    .padding(8.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small).clip(RoundedCornerShape(16.dp)),
-
-
+                modifier = Modifier
+                    .weight(1f),
                 textStyle = TextStyle(
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize ,color = MaterialTheme.colorScheme.onSurface),
+                    fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                    color = Color.White
+                ),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (promptText.value.text.isEmpty()) {
+                            Text(
+                                text = "Ask anything ...",
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
             )
 
-            Button(
+            IconButton(
                 onClick = {
                     val userPrompt = promptText.value.text
 
                     if (userPrompt.isNotBlank()) {
-                        // Add the user's prompt to the conversation
                         conversationList.add("You: $userPrompt")
-
-                        // Combine the expenses into a formatted string without categoryIcon
-                        //val expenseListString = expenses.joinToString(separator = "\n") { expense ->
-                        //    "Title: ${expense.title}, Amount: ${expense.currency}${expense.amount}, Date: ${expense.date}"
-                        //}
-
-                        //val fullPrompt = "$userPrompt\n\nExpense List:\n$expenseListString"
-
-                        // Call ViewModel function to handle the AI request
                         bakingViewModel.sendPromptWithExpenses(expenses, userPrompt)
-
-                        // Clear the TextField input after sending the prompt
                         promptText.value = TextFieldValue("")
                     }
+                    keyboardController?.hide()
                 },
-                enabled = promptText.value.text.isNotEmpty(), // Button is enabled only when input is not empty
+                enabled = promptText.value.text.isNotEmpty(),
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(start = 8.dp)
             ) {
-                Text("Send")
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    tint = Color.White
+                )
             }
         }
     }
@@ -149,10 +210,15 @@ fun ChatBotScreen(
 
 @Composable
 fun DonutChartComposable(pieChartData: PieChartData) {
-    Legends(legendsConfig = DataUtils.getLegendsConfigFromPieChartData(pieChartData = pieChartData, 2 ))
+    Legends(
+        legendsConfig = DataUtils.getLegendsConfigFromPieChartData(
+            pieChartData = pieChartData,
+            2
+        )
+    )
     DonutPieChart(
         modifier = Modifier
-            .size(400.dp ,400.dp ),
+            .size(400.dp, 400.dp),
         pieChartData = pieChartData,
         pieChartConfig = PieChartConfig(
             labelVisible = true,
