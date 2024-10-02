@@ -15,9 +15,7 @@ import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
-import com.google.ai.client.generativeai.type.generationConfig
-import com.google.firebase.vertexai.type.Schema
-import com.google.firebase.vertexai.type.defineFunction
+import com.sajithrajan.pisave.dataBase.Expense
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,10 +43,11 @@ class BakingViewModel : ViewModel() {
 
     fun getDonutChartData(expenses: List<Expense>): List<PieChartData.Slice> {
         val slices = expenses.map { expense ->
+            val expenseTitle = expense.note ?: expense.category
             PieChartData.Slice(
-                label = expense.title,
+                label = expenseTitle,
                 value = expense.amount.toFloat(),
-                color = getColorForCategory(expense.title) // Function to assign color based on category or title
+                color = getColorForCategory(expenseTitle) // Function to assign color based on category or note
             )
         }
         return slices
@@ -75,12 +74,12 @@ class BakingViewModel : ViewModel() {
         )
     }
 
-    val donutChartTool = defineFunction(
-        name = "DonutChartComposable",
-        description = "Plot the donut chart"
-    ) {
-
-    }
+//    val donutChartTool = defineFunction(
+//        name = "DonutChartComposable",
+//        description = "Plot the donut chart"
+//    ) {
+//
+//    }
 
     // Initialize the generative AI model (Gemini in this case)
     private val generativeModel = GenerativeModel(
@@ -93,7 +92,7 @@ class BakingViewModel : ViewModel() {
         _uiState.value = UiState.Loading
 
         val expenseListString = expenses.joinToString(separator = "\n") { expense ->
-            "Title: ${expense.title}, Amount: ${expense.currency}${expense.amount}, Date: ${expense.date}"
+            "note: ${expense.note}, Amount: ${expense.currency}${expense.amount}, Date: ${expense.date}"
         }
 
         val fullPrompt = "You are a personal financial adviser who enables the user to talk to their money and respond with some emojies. Keep your responses short while providing upto the point, concise and valuable insights. Below is the prompt given by the user:\n$prompt\n\nHere is the expense list:\n$expenseListString"

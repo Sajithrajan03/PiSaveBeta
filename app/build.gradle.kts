@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("kotlin-kapt")
 }
 
 android {
@@ -53,9 +54,8 @@ android {
 
 dependencies {
     implementation("com.github.jeziellago:compose-markdown:0.5.4")
-    // import firebase bom
+    implementation("androidx.compose.material:material-icons-extended:1.7.2")
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    // add the dependency for the Vertex AI for Firebase SDK for Android
     implementation("com.google.firebase:firebase-vertexai:16.0.0-beta01")
     implementation(libs.ycharts)
     implementation(libs.androidx.core.ktx)
@@ -76,5 +76,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.exyte:animated-navigation-bar:1.0.0")
 
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 }

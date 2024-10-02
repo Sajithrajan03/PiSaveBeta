@@ -1,4 +1,5 @@
 package com.sajithrajan.pisave
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,6 +37,8 @@ import co.yml.charts.common.utils.DataUtils
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.sajithrajan.pisave.dataBase.Expense
+import com.sajithrajan.pisave.ui.theme.NavyBlue
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 
@@ -41,7 +46,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 @Composable
 fun ChatBotScreen(
     bakingViewModel: BakingViewModel = viewModel(), // ViewModel
-    expenses: MutableList<Expense> // Passing the list of expenses
+    expenses: List<Expense> // Passing the list of expenses
 ) {
     val promptText = remember { mutableStateOf(TextFieldValue("")) } // TextField state
     val conversationList = remember { mutableStateListOf<String>() } // Conversation history
@@ -88,11 +93,14 @@ fun ChatBotScreen(
             BasicTextField(
                 value = promptText.value,
                 onValueChange = { promptText.value = it },
-                modifier = Modifier
+                modifier = Modifier.background(
+                    NavyBlue)
                     .height(100.dp)
                     .weight(1f)
                     .padding(8.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small),
+                    .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small).clip(RoundedCornerShape(16.dp)),
+
+
                 textStyle = TextStyle(
                     fontSize = MaterialTheme.typography.headlineMedium.fontSize ,color = MaterialTheme.colorScheme.onSurface),
             )
