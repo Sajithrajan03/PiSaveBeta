@@ -55,8 +55,6 @@ android {
 dependencies {
     implementation("com.github.jeziellago:compose-markdown:0.5.4")
     implementation("androidx.compose.material:material-icons-extended:1.7.2")
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-vertexai:16.0.0-beta01")
     implementation(libs.ycharts)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -50,17 +50,14 @@ import co.yml.charts.ui.piechart.models.PieChartData
 import com.sajithrajan.pisave.dataBase.Expense
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
-// Composable function for the chatbot screen
-
-
 @Composable
 fun ChatBotScreen(
     bakingViewModel: BakingViewModel = viewModel(), // ViewModel
     expenses: SnapshotStateList<Expense>,
 ) {
-    val promptText = remember { mutableStateOf(TextFieldValue("")) } // TextField state
-    val conversationList = remember { mutableStateListOf<String>() } // Conversation history
-    val uiState by bakingViewModel.uiState.collectAsState() // UI state from ViewModel
+    val promptText = remember { mutableStateOf(TextFieldValue("")) }
+    val conversationList = remember { mutableStateListOf<String>() }
+    val uiState by bakingViewModel.uiState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier
@@ -79,7 +76,7 @@ fun ChatBotScreen(
                 if (message.startsWith("AI: ")) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start // Align AI messages to the start (left)
+                        horizontalArrangement = Arrangement.Start
                     ) {
                         Card(
                             colors = CardDefaults.cardColors(
@@ -198,7 +195,6 @@ fun ChatBotScreen(
         }
     }
 
-    // Add the AI response or error to the conversation list
     LaunchedEffect(uiState) {
         when (uiState) {
             is UiState.Success -> conversationList.add("AI: ${(uiState as UiState.Success).outputText}")
