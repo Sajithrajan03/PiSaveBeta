@@ -1,6 +1,5 @@
 package com.sajithrajan.pisave
 
-import LightControlChat
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -128,8 +127,9 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
         ) { page ->
 
             when (page) {
-                0 -> LightControlChat()
-                1 -> ChatBotScreen(expenses = expenses)
+//                0 -> LightControlChat()
+                0 -> HomeScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
+                1 -> ChatBotScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
                 2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
             }
         }

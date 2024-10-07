@@ -55,6 +55,7 @@ android {
 dependencies {
     implementation("com.github.jeziellago:compose-markdown:0.5.4")
     implementation("androidx.compose.material:material-icons-extended:1.7.2")
+    implementation ("com.aallam.openai:openai-client:3.8.2")
     implementation(libs.ycharts)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -66,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.generativeai)
+    implementation("dev.langchain4j:langchain4j:0.35.0")
+    implementation("dev.langchain4j:langchain4j-mistral-ai:0.35.0")
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
