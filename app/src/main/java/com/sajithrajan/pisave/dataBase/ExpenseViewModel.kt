@@ -1,5 +1,6 @@
 package com.sajithrajan.pisave.dataBase
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,7 +61,7 @@ class ExpenseViewModel(
                 if (title.isBlank() || category.isBlank() || amount <= 0.0) {
                     return
                 }
-
+                Log.d("custom_log", "edititing")
                 // Create an Expense object with the given values
                 val expense = Expense(
                     title = title,

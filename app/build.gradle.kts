@@ -76,6 +76,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.exyte:animated-navigation-bar:1.0.0")
 
+    implementation("dev.langchain4j:langchain4j:0.35.0")
+    implementation("dev.langchain4j:langchain4j-mistral-ai:0.35.0")
+
     val room_version = "2.6.1"
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
