@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ExpenseViewModel(
-    private val dao: ExpenseDAO,
+    private val repository: ExpenseDAO
 ) : ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.DATE)
@@ -21,9 +21,9 @@ class ExpenseViewModel(
     private val _expense = _sortType
         .flatMapLatest { sortType->
             when(sortType){
-                SortType.TITLE -> dao.getExpensesOrderedByTitle()
-                SortType.AMOUNT -> dao.getExpensesOrderedByAmount()
-                SortType.DATE -> dao.getExpensesOrderedByDate()
+                SortType.TITLE -> repository.getExpensesOrderedByTitle()
+                SortType.AMOUNT -> repository.getExpensesOrderedByAmount()
+                SortType.DATE -> repository.getExpensesOrderedByDate()
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList() )
@@ -40,7 +40,7 @@ class ExpenseViewModel(
         when (event) {
             is ExpenseEvent.DeleteExpense -> {
                 viewModelScope.launch {
-                    dao.deleteExpense(event.expense)
+                    repository.deleteExpense(event.expense)
                 }
             }
             ExpenseEvent.HideDialog -> {
@@ -71,7 +71,7 @@ class ExpenseViewModel(
                     date = date
                 )
                 viewModelScope.launch {
-                    dao.upsertExpense(expense)
+                    repository.upsertExpense(expense)
                 }
 
                 _state.update { it.copy(

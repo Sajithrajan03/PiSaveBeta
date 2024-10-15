@@ -1,5 +1,4 @@
 package com.sajithrajan.pisave
-import co.yml.charts.ui.piechart.models.PieChartData
 /**
  * A sealed hierarchy describing the state of the text generation.
  */
@@ -15,6 +14,8 @@ sealed interface UiState {
      */
     object Loading : UiState
 
+    object chart : UiState
+
     /**
      * Text has been generated
      */
@@ -25,7 +26,7 @@ sealed interface UiState {
      */
     data class Error(val errorMessage: String) : UiState
 
-    data class Chart(val pieData: PieChartData) : UiState
+
 
 
 

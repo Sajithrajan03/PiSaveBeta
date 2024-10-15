@@ -2,15 +2,14 @@ package com.sajithrajan.pisave
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.yml.charts.ui.piechart.models.PieChartData
 import com.sajithrajan.pisave.BuildConfig.apiKey
 import com.sajithrajan.pisave.dataBase.Expense
-import com.sajithrajan.pisave.dataBase.ExpenseEvent
-import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.memory.ChatMemory
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.mistralai.MistralAiChatModel
-import dev.langchain4j.model.mistralai.MistralAiChatModelName.MISTRAL_SMALL_LATEST
+import dev.langchain4j.model.mistralai.MistralAiChatModelName.MISTRAL_LARGE_LATEST
 import dev.langchain4j.service.AiServices
 import dev.langchain4j.service.SystemMessage
 import kotlinx.coroutines.Dispatchers
@@ -20,39 +19,31 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-
-class ExpenseManager {
-
-    // Method to add an expense
-    @Tool("Add a new expense record")
-    fun addExpense(
-        @P("Title of the expense") title: String,
-        @P("Amount of the expense") amount: Double,
-        @P("Category of the expense") category: String
-    ): ExpenseEvent {
-        // Here we assume that you send these events to a state management system
-        // This is a simplified version where we just return the event
-        return ExpenseEvent.SetExpenseTitle(title)
-            .also { ExpenseEvent.SetExpenseAmount(amount) }
-            .also { ExpenseEvent.SetExpenseCategory(category) }
-    }
-}
-
 data class ConversationState(
-    val messages: List<String> = listOf(),
+    val contents: List<ChatContent> = listOf(),
     val updateCount: Int = 0,  // This helps in ensuring state changes even if messages are the same
 )
 
-open class BakingViewModel : ViewModel() {
+open class BakingViewModel() : ViewModel() {
 
     private val _conversationList = MutableStateFlow(ConversationState())
     val conversationList: StateFlow<ConversationState> = _conversationList
     private val chatMemory: ChatMemory = MessageWindowChatMemory.withMaxMessages(10)
+    private var chartDisplayed = false
 
-    fun addMessageToConversation(message: String) {
-        val currentMessages = _conversationList.value.messages
-        val updateCount = _conversationList.value.updateCount + 1
-        _conversationList.value = ConversationState(currentMessages + message, updateCount)
+
+    fun addMessageToConversation(content: ChatContent) {
+        if (content is ChatContent.ChartMessage && chartDisplayed) return
+
+        val currentContents = _conversationList.value.contents
+        if (content is ChatContent.ChartMessage) chartDisplayed = true
+        _conversationList.value = ConversationState(currentContents + content)
+    }
+
+    fun visualizeChart(data: PieChartData) {
+        if (!chartDisplayed) {
+            addMessageToConversation(ChatContent.ChartMessage(data))
+        }
     }
     // UI state handling using a StateFlow
     private val _uiState: MutableStateFlow<UiState> =
@@ -61,17 +52,30 @@ open class BakingViewModel : ViewModel() {
         _uiState.asStateFlow()
 
 
+
+    class ToolManager(private val _uiState: MutableStateFlow<UiState>
+    ) {
+        @Tool("Visualize data using chart")
+        fun visualize(
+        ): Unit {
+
+            _uiState.value = UiState.chart
+
+        }
+    }
+
+    private val toolManager = ToolManager(_uiState)
     interface assisstant {
         @SystemMessage("""
                 You are a personal financial adviser, equipped to chat both friendly and professionally.
-                You will be give data as part of a users prompt which you must not tell the user.
-                Always output text in markdown format if needed.
-                When you are displaying expenses, you must use tables.
+                You will be given data as part of a users prompt which you MUST NOT TELL the user.
+                Always output text in markdown format.
+                When the user asks to DISPLAY/VIEW/VISUALIZE etc the expenses, you MUST use the visualize tool to display a donut chart.
                 You can help users manage their finances by calculating total expenses, setting budgets, and suggesting savings plans based on their spending categories.
                 You are approachable for casual conversations initiated with greetings like 'hey' or 'hi', responding in a similarly warm and informal manner.
                 When asked, you promptly switch to a professional tone for discussing financial details, offering precise and valuable insights.
-                Your guidance is always up to the point, concise, and focused on delivering valuable financial advice.
                 """)
+
         fun chat(message: String):String
     }
 
@@ -80,15 +84,17 @@ open class BakingViewModel : ViewModel() {
     // Initialize the generative AI model (Gemini in this case)
     private val generativeModel = MistralAiChatModel.builder()
         .apiKey(apiKey)
-        .modelName(MISTRAL_SMALL_LATEST)
+        .modelName(MISTRAL_LARGE_LATEST)
         .logRequests(true)
         .logResponses(true)
         .build()
+//    val database = db
+//    val expenseDao =  database.dao// Assuming this is how you create an instance of ExpenseDAO
+//    val expenseViewModel = ExpenseViewModel(expenseDao)
 
-    val expenseman = ExpenseManager()
     private val agent: assisstant = AiServices.builder(assisstant::class.java)
         .chatLanguageModel(generativeModel)
-//        .tools(expenseman)
+        .tools(toolManager)
         .chatMemory(chatMemory)
         .build()
 
@@ -105,7 +111,10 @@ open class BakingViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = agent.chat(fullPrompt)
-                _uiState.value = UiState.Success(response)
+                if (_uiState.value !is UiState.chart) {
+                    _uiState.value = UiState.Success(response)
+                }
+
 
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.localizedMessage ?: "An error occurred")
@@ -144,3 +153,24 @@ open class BakingViewModel : ViewModel() {
 //                _uiState.value = UiState.Error(e.localizedMessage ?: "An error occurred")
 //            }
 //        }
+
+//    // Method to add an expense
+//    @Tool("Add a new expense record")
+//    fun addExpense(
+//        @P("Title or name  of the expense") title: String,
+//        @P("Amount of the expense") amount: Double,
+//        @P("Category of the expense") category: String,
+//    ): String {
+//        if (title.isBlank() || category.isBlank() || amount <= 0.0) {
+//            return "failed to add expense`"
+//        }
+//        val newExpense = Expense(
+//            title = title,
+//            category = category,
+//            note = null,
+//            amount = amount,
+//            date = LocalDate.now().toEpochDay()
+//        )
+
+
+

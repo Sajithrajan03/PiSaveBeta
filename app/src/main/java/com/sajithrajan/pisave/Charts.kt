@@ -18,7 +18,6 @@ import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.sajithrajan.pisave.dataBase.Expense
-import com.sajithrajan.pisave.ui.theme.LightBlue
 
 
 private fun getColorForCategory(category: String): Color {
@@ -58,7 +57,7 @@ fun DonutChartComposable(pieChartData: PieChartData) {
             modifier = Modifier
                 .width(300.dp)
                 .height(300.dp)
-                .background(color = Color.Black)
+                .background(color = Color.Transparent)
 
 
         ) {
@@ -71,7 +70,7 @@ fun DonutChartComposable(pieChartData: PieChartData) {
                 pieChartConfig = PieChartConfig(
                     labelVisible = true,
                     strokeWidth = 120f,
-                    backgroundColor = LightBlue,
+                    backgroundColor = Color.Transparent,
                     labelColor = Color.White,
                     activeSliceAlpha = 0.9f,
                     isAnimationEnable = true,

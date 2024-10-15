@@ -111,7 +111,6 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
                             tint = if (selectedTabIndex == item.ordinal) MaterialTheme.colorScheme.secondary else {
                                 MaterialTheme.colorScheme.surfaceTint
                             }
-
                         )
                     }
                 }
@@ -131,6 +130,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
                 0 -> HomeScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
                 1 -> ChatBotScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
                 2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
+
             }
         }
     }

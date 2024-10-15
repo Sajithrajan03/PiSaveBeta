@@ -1,4 +1,5 @@
 package com.sajithrajan.pisave
+
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -10,9 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.Row
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,23 +46,29 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.yml.charts.common.model.PlotType
+import co.yml.charts.ui.piechart.models.PieChartData
 import com.sajithrajan.pisave.dataBase.Expense
 import com.sajithrajan.pisave.dataBase.ExpenseEvent
 import com.sajithrajan.pisave.dataBase.ExpenseState
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import java.util.Locale
 
+
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun ChatBotScreen(
-    bakingViewModel: BakingViewModel = viewModel(), // ViewModel
+
     expenseList: List<Expense>,
     state: ExpenseState,
-    onEvent: (ExpenseEvent) -> Unit
+    onEvent: (ExpenseEvent) -> Unit,
+    bakingViewModel: BakingViewModel = viewModel(), // ViewModel
 ) {
+
+
     val promptText = remember { mutableStateOf(TextFieldValue("")) }
     val conversationState by bakingViewModel.conversationList.collectAsState()
-    val conversationList = conversationState.messages
+    val conversationContents = conversationState.contents
     val uiState by bakingViewModel.uiState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -72,18 +77,19 @@ fun ChatBotScreen(
             modifier = Modifier.fillMaxSize().weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
-            items(conversationList) { message ->
-                ChatMessageCard(message = message)
+            items(conversationContents) { content ->
+                when (content) {
+                    is ChatContent.TextMessage -> ChatMessageCard(message = content.message)
+                    is ChatContent.ChartMessage -> ChartMessageCard(pieChartData = content.pieChartData)
+                }
             }
-
         }
 
         UserInputSection(
             promptText = promptText,
             onSendMessage = { message ->
                 if (message.isNotBlank()) {
-                    bakingViewModel.addMessageToConversation("You: $message")
+                    bakingViewModel.addMessageToConversation(ChatContent.TextMessage("You: $message"))
                     bakingViewModel.sendPromptWithExpenses(expenseList, message)
                     promptText.value = TextFieldValue("")
                     keyboardController?.hide()
@@ -94,18 +100,34 @@ fun ChatBotScreen(
 
     LaunchedEffect(uiState) {
         when (uiState) {
+            is UiState.chart -> {
+                var pieData = PieChartData(getDonutChartData(expenseList), plotType = PlotType.Donut)
+                bakingViewModel.visualizeChart(pieData)
+            }
             is UiState.Success -> {
-                if (!conversationList.contains("AI: ${(uiState as UiState.Success).outputText}")) {
-                    bakingViewModel.addMessageToConversation("AI: ${(uiState as UiState.Success).outputText}")
+                if (!conversationContents.contains(ChatContent.TextMessage("AI: ${(uiState as UiState.Success).outputText}"))) {
+                    bakingViewModel.addMessageToConversation(ChatContent.TextMessage("AI: ${(uiState as UiState.Success).outputText}"))
                 }
             }
+
             is UiState.Error -> {
-                if (!conversationList.contains("Error: ${(uiState as UiState.Error).errorMessage}")) {
-                    bakingViewModel.addMessageToConversation("Error: ${(uiState as UiState.Error).errorMessage}")
+                if (!conversationContents.contains(ChatContent.TextMessage("Error: ${(uiState as UiState.Error).errorMessage}"))) {
+                    bakingViewModel.addMessageToConversation(ChatContent.TextMessage("Error: ${(uiState as UiState.Error).errorMessage}"))
                 }
             }
             else -> Unit
         }
+    }
+}
+
+@Composable
+fun ChartMessageCard(pieChartData: PieChartData) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black
+        ),
+        modifier = Modifier.padding(10.dp)) {
+        DonutChartComposable(pieChartData = pieChartData)
     }
 }
 
@@ -121,14 +143,13 @@ fun ChatMessageCard(message: String) {
             ),
             modifier = Modifier.padding(5.dp)
         ) {
-            MarkdownText(
-                markdown = message, // AI's message
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(10.dp)
-            )
+            Column {
+                MarkdownText(
+                    markdown = message,
+                    style = TextStyle(color = Color.White, fontSize = 16.sp),
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
         }
     }
 }
@@ -198,6 +219,8 @@ fun UserInputSection(promptText: MutableState<TextFieldValue>, onSendMessage: (S
         }
     }
 }
+
+
 
 
 // Example Expense class (used as part of the ViewModel)
