@@ -1,4 +1,4 @@
-package com.sajithrajan.pisave.chatbot
+package com.sajithrajan.pisave
 
 //import com.sajithrajan.pisave.DonutChartComposable
 import androidx.compose.foundation.background
@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import com.sajithrajan.pisave.dataBase.Expense
 import com.sajithrajan.pisave.dataBase.ExpenseEvent
 import com.sajithrajan.pisave.dataBase.ExpenseState
-import com.sajithrajan.pisave.getTransactionStatus
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 

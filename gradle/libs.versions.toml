@@ -12,6 +12,8 @@ composeBom = "2024.04.01"
 generativeai = "0.7.0"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
 navigationCompose = "2.8.1"
+uiTextGoogleFonts = "1.7.3"
+runtimeLivedata = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +34,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 ycharts = { module = "co.yml:ycharts", version = "2.1.0" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 
 [plugins]

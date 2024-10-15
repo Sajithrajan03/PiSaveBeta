@@ -1,5 +1,6 @@
 package com.sajithrajan.pisave
 
+
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,12 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Adb
 import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Receipt
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,13 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.AnimatedNavigationBar
 import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
 import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.sajithrajan.pisave.ExpenseScreen.ExpenseScreen
-import com.sajithrajan.pisave.chatbot.ChatBotScreen
 import com.sajithrajan.pisave.dataBase.ExpenseViewModel
 
 
@@ -57,7 +64,33 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
         onClick()
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScreenTopBar() {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                "PiSave",
+                style = MaterialTheme.typography.headlineLarge
+            )
+        },
+        actions={
+            IconButton(
+                onClick = {
+//                    onEvent(ExpenseEvent.DeleteExpense(expense))
+                },
+                modifier = Modifier.align(Alignment.CenterVertically)  // Align delete button vertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+        }
+    )
+}
 @Composable
 fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
     var selectedTabIndex by remember {
@@ -68,6 +101,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
         initialPage = 1,
         pageCount = { 3 } // Number of tabs/pages
     )
+
 
     val navigationBarItems = remember { NavigationBarItems.values() }
     val state by viewModel.state.collectAsState()
@@ -88,6 +122,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
 
 
     Scaffold(
+        topBar = {ScreenTopBar()},
         bottomBar = {
             AnimatedNavigationBar(
                 modifier = Modifier.height(64.dp),
@@ -124,11 +159,12 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Apply padding from Scaffold
+                .padding(paddingValues)
+                .nestedScroll(rememberNestedScrollInteropConnection())
         ) { page ->
 
             when (page) {
-//                0 -> PaymentTransactionApp()
+                0 -> DashBoardMain( )
                 1 -> ChatBotScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
                 2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
             }

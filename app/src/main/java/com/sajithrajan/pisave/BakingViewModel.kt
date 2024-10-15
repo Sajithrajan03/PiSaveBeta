@@ -43,7 +43,7 @@ open class BakingViewModel : ViewModel() {
 
     fun getDonutChartData(expenses: List<Expense>): List<PieChartData.Slice> {
         val slices = expenses.map { expense ->
-            val expenseTitle = expense.note ?: expense.category
+            val expenseTitle = expense.note ?: expense.title
             PieChartData.Slice(
                 label = expenseTitle,
                 value = expense.amount.toFloat(),

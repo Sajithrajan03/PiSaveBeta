@@ -1,48 +1,11 @@
-// ExpensesData.kt
-package com.sajithrajan.pisave
+import com.sajithrajan.pisave.dataBase.Category
 
-import androidx.compose.runtime.mutableStateListOf
-import com.sajithrajan.pisave.dataBase.Expense
-import java.time.LocalDate
-
-
-// Define your list of expenses here
-val expenses = mutableStateListOf(
-//    Expense(categoryIcon = Icons.Filled.Fastfood, category="Food",note = "Groceries", amount = 150.0, currency = "$", date = LocalDate.now().minusDays(2)),
-//    Expense(categoryIcon = Icons.Filled.Movie, category="Entertainment",note = "Movie Tickets", amount = 45.0, currency = "$", date = LocalDate.now().minusDays(1)),
-//    Expense(categoryIcon = Icons.Filled.DirectionsBusFilled,category="Transport", note = "Gas", amount = 60.0, currency = "$", date = LocalDate.now()),
-//    Expense(categoryIcon = Icons.Filled.ShoppingBag, category="Shopping",note = "Shopping", amount = 80.0, currency = "$", date = LocalDate.now().minusDays(3))
-
-    Expense(
-        category = "Food",
-        title = "Groceries",
-        amount = 150.0,
-        currency = "$",
-        date = LocalDate.now().minusDays(2).toEpochDay(), // Convert LocalDate to Long (epoch days)
-        note = null // or any relevant note
-    ),
-    Expense(
-        category = "Entertainment",
-        title = "Movie Tickets",
-        amount = 45.0,
-        currency = "$",
-        date = LocalDate.now().minusDays(1).toEpochDay(),
-        note = null
-    ),
-    Expense(
-        category = "Transport",
-        title = "Gas",
-        amount = 60.0,
-        currency = "$",
-        date = LocalDate.now().toEpochDay(),
-        note = null
-    ),
-    Expense(
-        category = "Shopping",
-        title = "Shopping",
-        amount = 80.0,
-        currency = "$",
-        date = LocalDate.now().minusDays(3).toEpochDay(),
-        note = null
-    )
+val predefinedCategories = listOf(
+    Category(categoryId = 1, categoryName = "Food", iconName = "food_icon"),
+    Category(categoryId = 2, categoryName = "Transport", iconName = "transport_icon"),
+    Category(categoryId = 3, categoryName = "Entertainment", iconName = "entertainment_icon"),
+    Category(categoryId = 4, categoryName = "Shopping", iconName = "shopping_icon"),
+    Category(categoryId = 5, categoryName = "Health", iconName = "health_icon"),
+    Category(categoryId = 6, categoryName = "Utilities", iconName = "utilities_icon"),
+    Category(categoryId = 7, categoryName = "Others", iconName = "others_icon")
 )

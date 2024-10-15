@@ -22,10 +22,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sajithrajan.pisave.dataBase.Expense
 import com.sajithrajan.pisave.dataBase.ExpenseEvent
 import com.sajithrajan.pisave.dataBase.ExpenseState
+import com.sajithrajan.pisave.dataBase.ExpenseViewModel
 import com.sajithrajan.pisave.dataBase.SortType
+import predefinedCategories
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +38,7 @@ fun ExpenseScreen(
     state: ExpenseState,
     onEvent: (ExpenseEvent) -> Unit
 ) {
-
+    val viewModel: ExpenseViewModel = viewModel()
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
@@ -71,7 +74,7 @@ fun ExpenseScreen(
                     }
                 }
             }
-            ExpenseList(expenseList = expenseList,state,onEvent)
+            ExpenseList(expenseList = expenseList,viewModel,state,onEvent )
         }
 
 
@@ -91,7 +94,8 @@ fun ExpenseScreen(
                 state = state,
                 onEvent = onEvent,
                 sheetState = sheetState,
-                scope = scope
+                scope = scope,
+                categories = predefinedCategories
             )
         }
     }
