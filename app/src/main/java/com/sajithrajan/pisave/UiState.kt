@@ -20,7 +20,7 @@ sealed interface UiState {
      * Text has been generated
      */
     data class Success(val outputText: String) : UiState
-
+//for all
     /**
      * There was an error generating text
      */
