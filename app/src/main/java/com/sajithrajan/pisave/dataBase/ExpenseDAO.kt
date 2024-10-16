@@ -7,6 +7,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -54,6 +55,9 @@ interface ExpenseDAO{
 
     @Query("SELECT SUM(amount) as total, date FROM expenses GROUP BY date ORDER BY date ASC")
     fun getAllDailyExpenses(): LiveData<List<DailyExpense>>
+
+    @Update
+    suspend fun updateExpense(expense: Expense)
 }
 
 
@@ -86,6 +90,21 @@ data class CategorySpending(
 )
 data class DailyExpense(
     val total: Double,
-    val date: Long // Assuming the date is stored as a timestamp in the database
+    val date: Long
 )
 
+
+@Dao
+interface TransactionDao {
+    @Insert
+    suspend fun insertTransaction(transaction: TransactionEntity)
+
+    @Query("SELECT * FROM transactions ORDER BY date DESC")
+    suspend fun getAllTransactions(): List<TransactionEntity>
+
+    @Delete
+    suspend fun deleteTransaction(transaction: TransactionEntity)
+
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAllTransactions()
+}

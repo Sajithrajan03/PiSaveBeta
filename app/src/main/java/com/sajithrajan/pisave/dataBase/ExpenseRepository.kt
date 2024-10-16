@@ -3,7 +3,7 @@ package com.sajithrajan.pisave.dataBase
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
 
-class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val categoryDAO: CategoryDAO) {
+class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val categoryDAO: CategoryDAO,private val transactionDao: TransactionDao) {
 
     suspend fun upsert(expense: Expense) = expenseDAO.upsertExpense(expense)
 
@@ -21,12 +21,12 @@ class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val category
         return expenseDAO.getTopExpensesForCurrentDay()
     }
 
-    // Get top expenses for the current month
+
     fun getTopExpensesForCurrentMonth(): LiveData<List<Expense>> {
         return expenseDAO.getTopExpensesForCurrentMonth()
     }
 
-    // Get top expenses for the current year
+
     fun getTopExpensesForCurrentYear(): LiveData<List<Expense>> {
         return expenseDAO.getTopExpensesForCurrentYear()
     }
@@ -49,6 +49,24 @@ class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val category
     }
     fun getAllDailyExpenses(): LiveData<List<DailyExpense>> {
         return expenseDAO.getAllDailyExpenses()
+    }
+
+    suspend fun insertTransaction(transaction: TransactionEntity) {
+        transactionDao.insertTransaction(transaction)
+    }
+
+    suspend fun getAllTransactions(): List<TransactionEntity> {
+        return transactionDao.getAllTransactions()
+    }
+    suspend fun deleteTransaction(transaction: TransactionEntity) {
+        transactionDao.deleteTransaction(transaction)
+    }
+
+    suspend fun deleteAllTransactions() {
+        transactionDao.deleteAllTransactions()
+    }
+    suspend fun updateExpense(expense: Expense) {
+        expenseDAO.updateExpense(expense)
     }
 }
 

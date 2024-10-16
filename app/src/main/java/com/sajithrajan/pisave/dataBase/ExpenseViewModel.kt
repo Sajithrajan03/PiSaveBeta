@@ -4,8 +4,10 @@ package com.sajithrajan.pisave.dataBase
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -20,7 +22,7 @@ class ExpenseViewModel(
     // LiveData to observe all expenses
     val allExpenses: LiveData<List<Expense>> = repository.getAllExpenses()
 
-    // State management for sorting expenses
+
     private val _sortType = MutableStateFlow(SortType.DATE)
     private val _state = MutableStateFlow(ExpenseState())
 
@@ -34,7 +36,7 @@ class ExpenseViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    // Combine state and sorted expenses
+
     val state = combine(_state, _sortType, _expenseFlow) { state, sortType, expenses ->
         state.copy(
             expenselist = expenses,
@@ -42,14 +44,14 @@ class ExpenseViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExpenseState())
 
-    // Insert or update an expense
+
     fun upsertExpense(expense: Expense) {
         viewModelScope.launch {
             repository.upsert(expense)
         }
     }
 
-    // Handle category fetching
+
     fun getCategoryIconName(categoryId: Int, callback: (String?) -> Unit) {
         viewModelScope.launch {
             val category = repository.getCategoryById(categoryId)
@@ -57,7 +59,7 @@ class ExpenseViewModel(
         }
     }
 
-    // Process various events
+
     fun onEvent(event: ExpenseEvent) {
         when (event) {
             is ExpenseEvent.DeleteExpense -> {
@@ -94,6 +96,11 @@ class ExpenseViewModel(
         }
     }
 
+    fun addExpense(expense: Expense) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.upsert(expense)
+        }
+    }
 
     fun getCategoryWiseSpendingForMonth(month: String): LiveData<List<CategorySpendingTable>> {
         return repository.getCategoryWiseSpendingForMonth(month)
@@ -123,6 +130,63 @@ class ExpenseViewModel(
     fun getTopExpensesForCurrentYear(): LiveData<List<Expense>> {
         return repository.getTopExpensesForCurrentYear()
     }
+    private val _transactions = MutableStateFlow<List<TransactionEntity>>(emptyList())
+    val transactions: StateFlow<List<TransactionEntity>> = _transactions
+
+
+    fun fetchTransactions() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val transactionList = repository.getAllTransactions()
+            _transactions.value = transactionList
+        }
+    }
+
+    fun addTransaction(transaction: TransactionEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insertTransaction(transaction)
+            fetchTransactions() // Refresh the list after adding
+        }
+    }
+    fun isDuplicateTransaction(transaction: TransactionEntity): Boolean {
+        val currentTransactions = _transactions.value
+        return currentTransactions.any {
+            it.title == transaction.title &&
+                    it.date == transaction.date &&
+                    it.amount == transaction.amount
+        }
+
+    }
+    fun deleteTransaction(transaction: TransactionEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteTransaction(transaction)
+            fetchTransactions() // Refresh the list after deletion
+        }
+    }
+
+    fun deleteAllTransactions() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllTransactions()
+            fetchTransactions() // Refresh the list after deletion
+        }
+    }
+    fun uploadTransactionAsExpense(transaction: TransactionEntity) {
+        val expense = Expense(
+            title = transaction.title,
+            category = transaction.category,
+            note = transaction.note,
+            amount = transaction.amount,
+            currency = transaction.currency,
+            date = transaction.date
+        )
+        addExpense(expense)
+    }
+
+    fun updateExpense(expense: Expense) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateExpense(expense)
+        }
+    }
+
 }
 
 
@@ -148,3 +212,4 @@ fun getEndOfDay(timeMillis: Long): Long {
     }
     return calendar.timeInMillis
 }
+

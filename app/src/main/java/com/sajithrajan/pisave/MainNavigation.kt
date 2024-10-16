@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.sajithrajan.pisave.ExpenseScreen.ExpenseScreen
 import com.sajithrajan.pisave.dataBase.ExpenseViewModel
-import com.sajithrajan.pisave.profile.ProfileScreen
 
 
 data class TabItem(
@@ -120,7 +119,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel , onNavigateToProfile: () -
             selectedTabIndex = pagerState.currentPage
         }
     }
-
+    val transactions by viewModel.transactions.collectAsState()
 
 
     Scaffold(
@@ -187,7 +186,7 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel , onNavigateToProfile: () -
             when (page) {
                 0 -> DashBoardMain( )
                 1 -> ChatBotScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
-                2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
+                2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist,transactionList = transactions)
             }
         }
     }
@@ -199,6 +198,6 @@ fun MainScreen(viewModel: ExpenseViewModel) {
 
     when (currentScreen) {
         "home" -> MainNavigationScreen(viewModel = viewModel, onNavigateToProfile = { currentScreen = "profile" })
-        "profile" -> ProfileScreen(onNavigateToHome = { currentScreen = "home" })
+        "profile" -> ProfileScreen(onNavigateToHome = { currentScreen = "home" }, expenseViewModel = viewModel)
     }
 }

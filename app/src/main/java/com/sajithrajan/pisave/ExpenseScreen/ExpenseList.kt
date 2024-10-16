@@ -1,5 +1,7 @@
 package com.sajithrajan.pisave.ExpenseScreen
 
+import EditTransactionDialog
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +28,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -90,11 +96,13 @@ fun ExpenseItem(
 ) {
     val icon = getExpenseIcon(expense.category ?: "Others")
     val color = getCategoryColor(expense.category ?: "Others")
+    var showEditDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+        .clickable { showEditDialog = true },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -178,5 +186,16 @@ fun ExpenseItem(
                 )
             }
         }
+    }
+
+    if (showEditDialog) {
+        EditTransactionDialog(
+            expense = expense,
+            onDismiss = { showEditDialog = false },
+            onSave = { updatedExpense ->
+                viewModel.updateExpense(updatedExpense)
+                showEditDialog = false
+            }
+        )
     }
 }

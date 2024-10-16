@@ -25,3 +25,13 @@ data class Category(
     val iconName: String
 )
 
+@Entity(tableName = "transactions")
+data class TransactionEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val category: String,
+    val note: String?,
+    val amount: Double,
+    val currency: String = "₹",
+    val date: Long
+)
