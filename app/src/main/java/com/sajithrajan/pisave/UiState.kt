@@ -15,6 +15,8 @@ sealed interface UiState {
      */
     object Loading : UiState
 
+
+    object chartLoading:UiState
     /**
      * Text has been generated
      */

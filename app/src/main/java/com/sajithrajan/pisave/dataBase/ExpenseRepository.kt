@@ -17,9 +17,19 @@ class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val category
 
     suspend fun deleteExpense(expense: Expense) = expenseDAO.deleteExpense(expense)
 
-    suspend fun insertCategory(category: Category) = categoryDAO.insertCategory(category)
+    fun getTopExpensesForCurrentDay(): LiveData<List<Expense>> {
+        return expenseDAO.getTopExpensesForCurrentDay()
+    }
 
-    fun getAllCategories(): LiveData<List<Category>> = categoryDAO.getAllCategories()
+    // Get top expenses for the current month
+    fun getTopExpensesForCurrentMonth(): LiveData<List<Expense>> {
+        return expenseDAO.getTopExpensesForCurrentMonth()
+    }
+
+    // Get top expenses for the current year
+    fun getTopExpensesForCurrentYear(): LiveData<List<Expense>> {
+        return expenseDAO.getTopExpensesForCurrentYear()
+    }
 
     suspend fun getCategoryById(categoryId: Int): Category? = categoryDAO.getCategoryById(categoryId)
 

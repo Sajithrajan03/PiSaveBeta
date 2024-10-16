@@ -20,7 +20,7 @@ fun RelativeDateText(epochTime: Long): String {
             "Yesterday"
         }
         // If it's within a week
-        TimeUnit.MILLISECONDS.toDays(currentTime - epochTime) <= 7 -> {
+        TimeUnit.MILLISECONDS.toDays(currentTime - epochTime) <= 5 -> {
             val daysAgo = TimeUnit.MILLISECONDS.toDays(currentTime - epochTime)
             "$daysAgo days ago"
         }

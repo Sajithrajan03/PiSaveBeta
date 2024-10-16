@@ -2,20 +2,25 @@ package com.sajithrajan.pisave
 
 
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.outlined.Adb
-import androidx.compose.material.icons.outlined.Dashboard
-import androidx.compose.material.icons.outlined.Receipt
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,12 +43,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
-import com.exyte.animatednavbar.AnimatedNavigationBar
-import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
-import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.sajithrajan.pisave.ExpenseScreen.ExpenseScreen
 import com.sajithrajan.pisave.dataBase.ExpenseViewModel
+import com.sajithrajan.pisave.profile.ProfileScreen
 
 
 data class TabItem(
@@ -51,9 +55,9 @@ data class TabItem(
     val selectedIcon: ImageVector
 )
 enum class NavigationBarItems(val icon: ImageVector) {
-    Person(icon = Icons.Outlined.Dashboard,),
-    Call(icon =  Icons.Outlined.Adb),
-    Settings(icon = Icons.Outlined.Receipt)
+    Dashboard(icon = Icons.Default.Dashboard),
+    Chatbot(icon = Icons.Filled.Memory),
+    ExpenseList(icon = Icons.Default.Receipt)
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
@@ -66,7 +70,7 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenTopBar() {
+fun ScreenTopBar(onNavigateToProfile: () -> Unit) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -76,9 +80,7 @@ fun ScreenTopBar() {
         },
         actions={
             IconButton(
-                onClick = {
-//                    onEvent(ExpenseEvent.DeleteExpense(expense))
-                },
+                onClick = onNavigateToProfile,
                 modifier = Modifier.align(Alignment.CenterVertically)  // Align delete button vertically
             ) {
                 Icon(
@@ -92,7 +94,7 @@ fun ScreenTopBar() {
     )
 }
 @Composable
-fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
+fun MainNavigationScreen(viewModel: ExpenseViewModel , onNavigateToProfile: () -> Unit) {
     var selectedTabIndex by remember {
         mutableIntStateOf(1)
     }
@@ -122,37 +124,56 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
 
 
     Scaffold(
-        topBar = {ScreenTopBar()},
+        topBar = {ScreenTopBar(onNavigateToProfile)},
         bottomBar = {
-            AnimatedNavigationBar(
+            BottomAppBar(
                 modifier = Modifier.height(64.dp),
-                selectedIndex = selectedTabIndex,
-//                cornerRadius = shapeCornerRadius(cornerRadius = 34.dp),
-                ballAnimation = Parabolic(tween(durationMillis = 1)),
-                indentAnimation = Height(tween(durationMillis = 1)),
-                barColor = MaterialTheme.colorScheme.surface,
-                ballColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+                tonalElevation = 5.dp
             ) {
-                navigationBarItems.forEach { item ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .noRippleClickable { selectedTabIndex = item.ordinal },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(26.dp),
-                            imageVector = item.icon,
-                            contentDescription = "Bottom Bar Icon",
-                            tint = if (selectedTabIndex == item.ordinal) MaterialTheme.colorScheme.secondary else {
-                                MaterialTheme.colorScheme.surfaceTint
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    navigationBarItems.forEachIndexed { index, item ->
+                        val isSelected = selectedTabIndex == index
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .noRippleClickable { selectedTabIndex = index },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isSelected) {
+                                // Adding the glow effect
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                            shape = CircleShape
+                                        )
+                                        .align(Alignment.Center)
+                                )
                             }
-
-                        )
+                            Icon(
+                                modifier = Modifier
+                                    .size(if (isSelected) 30.dp else 26.dp),
+                                imageVector = item.icon,
+                                contentDescription = "Bottom Bar Icon",
+                                tint = if (isSelected) {
+                                    MaterialTheme.colorScheme.secondary
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceTint
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
+
     ) { paddingValues ->
 
         HorizontalPager(
@@ -169,5 +190,15 @@ fun MainNavigationScreen(viewModel: ExpenseViewModel ) {
                 2 -> ExpenseScreen( state = state, onEvent = viewModel::onEvent , expenseList = state.expenselist)
             }
         }
+    }
+}
+
+@Composable
+fun MainScreen(viewModel: ExpenseViewModel) {
+    var currentScreen by remember { mutableStateOf("home") }
+
+    when (currentScreen) {
+        "home" -> MainNavigationScreen(viewModel = viewModel, onNavigateToProfile = { currentScreen = "profile" })
+        "profile" -> ProfileScreen(onNavigateToHome = { currentScreen = "home" })
     }
 }

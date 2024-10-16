@@ -32,14 +32,25 @@ interface ExpenseDAO{
     @Query("SELECT * FROM expenses ORDER BY title DESC")
     fun getExpensesOrderedByTitle(): Flow<List<Expense>>
 
-    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE strftime('%m', date / 1000, 'unixepoch') = :month GROUP BY category")
+    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE strftime('%m', date / 1000, 'unixepoch') = :month GROUP BY category ORDER BY totalAmount DESC")
     fun getCategoryWiseSpendingForMonth(month: String): LiveData<List<CategorySpendingTable>>
 
-    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE strftime('%Y', date / 1000, 'unixepoch') = :year GROUP BY category")
+    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE strftime('%Y', date / 1000, 'unixepoch') = :year GROUP BY category ORDER BY totalAmount DESC")
     fun getCategoryWiseSpendingForYear(year: String): LiveData<List<CategorySpendingTable>>
 
-    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE date(date / 1000, 'unixepoch') = :day GROUP BY category")
+    @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE date(date / 1000, 'unixepoch') = :day GROUP BY category ORDER BY totalAmount DESC")
     fun getCategoryWiseSpendingForDay(day: String): LiveData<List<CategorySpendingTable>>
+
+    @Query("SELECT * FROM expenses WHERE date(date / 1000, 'unixepoch') = date('now') ORDER BY amount DESC")
+    fun getTopExpensesForCurrentDay(): LiveData<List<Expense>>
+
+    // Top expenses for the current month
+    @Query("SELECT * FROM expenses WHERE strftime('%Y-%m', date / 1000, 'unixepoch') = strftime('%Y-%m', 'now') ORDER BY amount DESC")
+    fun getTopExpensesForCurrentMonth(): LiveData<List<Expense>>
+
+    // Top expenses for the current year
+    @Query("SELECT * FROM expenses WHERE strftime('%Y', date / 1000, 'unixepoch') = strftime('%Y', 'now') ORDER BY amount DESC")
+    fun getTopExpensesForCurrentYear(): LiveData<List<Expense>>
 
     @Query("SELECT SUM(amount) as total, date FROM expenses GROUP BY date ORDER BY date ASC")
     fun getAllDailyExpenses(): LiveData<List<DailyExpense>>

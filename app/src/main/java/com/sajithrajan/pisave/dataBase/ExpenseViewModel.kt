@@ -110,6 +110,19 @@ class ExpenseViewModel(
     fun getTotalExpensesForDay(): LiveData<List<DailyExpense>> {
         return repository.getAllDailyExpenses()
     }
+    fun getTopExpensesForCurrentDay(): LiveData<List<Expense>> {
+        return repository.getTopExpensesForCurrentDay()
+    }
+
+    // LiveData for top expenses for the current month
+    fun getTopExpensesForCurrentMonth(): LiveData<List<Expense>> {
+        return repository.getTopExpensesForCurrentMonth()
+    }
+
+    // LiveData for top expenses for the current year
+    fun getTopExpensesForCurrentYear(): LiveData<List<Expense>> {
+        return repository.getTopExpensesForCurrentYear()
+    }
 }
 
 

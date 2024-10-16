@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface,
                 ) {
-                    MainNavigationScreen(viewModel = viewModel)
+                    MainScreen(viewModel = viewModel)
                 }
             }
         }

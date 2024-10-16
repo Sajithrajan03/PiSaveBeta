@@ -1,7 +1,7 @@
 package com.sajithrajan.pisave.ExpenseScreen
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +12,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -55,23 +57,24 @@ fun ExpenseScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp), // Add space between chips
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SortType.entries.forEach { sortType ->
-                    Row(
-                        modifier = Modifier.clickable {
+                    FilterChip(
+                        selected = state.sortType == sortType,
+                        onClick = {
                             onEvent(ExpenseEvent.SortExpense(sortType))
                         },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = state.sortType == sortType,
-                            onClick = {
-                                onEvent(ExpenseEvent.SortExpense(sortType))
-                            }
+                        label = { Text(text = sortType.name) },
+                        modifier = Modifier.padding(4.dp), // Additional padding for better spacing
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            selectedLabelColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurface
                         )
-                        Text(text = sortType.name)
-                    }
+                    )
                 }
             }
             ExpenseList(expenseList = expenseList,viewModel,state,onEvent )
