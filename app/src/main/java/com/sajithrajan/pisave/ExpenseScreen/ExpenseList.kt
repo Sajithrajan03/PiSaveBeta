@@ -195,7 +195,8 @@ fun ExpenseItem(
             onSave = { updatedExpense ->
                 viewModel.updateExpense(updatedExpense)
                 showEditDialog = false
-            }
+            },
+            viewModel = viewModel
         )
     }
 }

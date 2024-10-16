@@ -78,7 +78,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.exyte:animated-navigation-bar:1.0.0")
-
+    implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("dev.langchain4j:langchain4j:0.35.0")
     implementation("dev.langchain4j:langchain4j-mistral-ai:0.35.0")
 

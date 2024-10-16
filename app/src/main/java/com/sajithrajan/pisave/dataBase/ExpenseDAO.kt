@@ -108,3 +108,25 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     suspend fun deleteAllTransactions()
 }
+
+@Dao
+interface SplitExpenseDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSplitExpense(splitExpense: SplitExpenseEntity)
+
+    @Query("SELECT * FROM split_expenses WHERE expenseId = :expenseId LIMIT 1")
+    suspend fun getSplitExpensesForExpense(expenseId: Int): List<SplitExpenseEntity>
+
+    @Query("DELETE FROM split_expenses WHERE expenseId = :expenseId")
+    suspend fun deleteSplitExpensesForExpense(expenseId: Int)
+}
+
+@Dao
+interface ReceiptDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertReceipt(receipt: ReceiptEntity)
+
+    @Query("SELECT * FROM receipts WHERE expenseId = :expenseId")
+    suspend fun getReceiptsForExpense(expenseId: Int): List<ReceiptEntity>
+}

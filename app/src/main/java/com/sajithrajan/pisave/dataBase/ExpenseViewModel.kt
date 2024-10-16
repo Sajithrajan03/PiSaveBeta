@@ -186,6 +186,30 @@ class ExpenseViewModel(
             repository.updateExpense(expense)
         }
     }
+    fun saveSplitExpenses(expenseId: Int, splitData: Map<String, Double>) {
+        viewModelScope.launch {
+            repository.saveSplitExpenses(expenseId, splitData)
+        }
+    }
+
+    suspend fun getSplitExpenses(expenseId: Int): List<SplitExpenseEntity> {
+        return repository.getSplitExpensesForExpense(expenseId)
+    }
+
+    fun deleteSplitExpenses(expenseId: Int) {
+        viewModelScope.launch {
+            repository.deleteSplitExpensesForExpense(expenseId)
+        }
+    }
+    fun insertReceipt(receipt: ReceiptEntity) {
+        viewModelScope.launch {
+            repository.insertReceipt(receipt)
+        }
+    }
+
+    suspend fun getReceiptsForExpense(expenseId: Int): List<ReceiptEntity> {
+        return repository.getReceiptsForExpense(expenseId)
+    }
 
 }
 

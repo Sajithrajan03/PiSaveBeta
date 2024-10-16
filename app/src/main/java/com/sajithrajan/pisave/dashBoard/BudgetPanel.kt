@@ -104,7 +104,7 @@ fun BudgetCard(
 fun CustomCircularProgressIndicator(
     modifier: Modifier = Modifier,
     used: Double,
-    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    primaryColor: Color = MaterialTheme.colorScheme.onPrimary,
     secondaryColor: Color = MaterialTheme.colorScheme.inverseSurface,
     minValue: Int = 0,
     total: Double = 100.0,

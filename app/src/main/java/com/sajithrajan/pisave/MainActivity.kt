@@ -32,7 +32,9 @@ class MainActivity : ComponentActivity() {
         val repository = ExpenseRepository(
             database.expenseDao(),
             database.categoryDao(),
-            database.transactionDao()
+            database.transactionDao(),
+            database.splitExpenseDao(),
+            database.receiptDao()
         )
 
         val viewModel: ExpenseViewModel by viewModels {

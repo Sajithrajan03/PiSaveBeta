@@ -35,3 +35,18 @@ data class TransactionEntity(
     val currency: String = "₹",
     val date: Long
 )
+
+@Entity(tableName = "split_expenses")
+data class SplitExpenseEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val expenseId: Int,
+    val participantName: String,
+    val amount: Double
+)
+
+@Entity(tableName = "receipts")
+data class ReceiptEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val expenseId: Int,
+    val imageUri: String
+)

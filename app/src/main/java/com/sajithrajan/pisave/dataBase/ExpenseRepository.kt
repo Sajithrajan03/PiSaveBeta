@@ -1,9 +1,11 @@
 package com.sajithrajan.pisave.dataBase
 
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val categoryDAO: CategoryDAO,private val transactionDao: TransactionDao) {
+class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val categoryDAO: CategoryDAO,private val transactionDao: TransactionDao,private val splitExpenseDao: SplitExpenseDao,private val receiptDao: ReceiptDao) {
 
     suspend fun upsert(expense: Expense) = expenseDAO.upsertExpense(expense)
 
@@ -67,6 +69,47 @@ class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val category
     }
     suspend fun updateExpense(expense: Expense) {
         expenseDAO.updateExpense(expense)
+    }
+    suspend fun insertSplitExpense(splitExpense: SplitExpenseEntity) {
+        splitExpenseDao.insertSplitExpense(splitExpense)
+    }
+
+    // Function to get all split expenses for a specific expense
+    suspend fun getSplitExpensesForExpense(expenseId: Int): List<SplitExpenseEntity> {
+        return splitExpenseDao.getSplitExpensesForExpense(expenseId)
+    }
+
+    // Function to delete all split expenses for a specific expense
+    suspend fun deleteSplitExpensesForExpense(expenseId: Int) {
+        splitExpenseDao.deleteSplitExpensesForExpense(expenseId)
+    }
+
+    // Function to save multiple split expenses for an expense
+    suspend fun saveSplitExpenses(expenseId: Int, splitData: Map<String, Double>) {
+        // Delete existing split expenses for the given expense
+        splitExpenseDao.deleteSplitExpensesForExpense(expenseId)
+
+        // Insert each split expense entry
+        splitData.forEach { (participant, amount) ->
+            val splitExpense = SplitExpenseEntity(
+                expenseId = expenseId,
+                participantName = participant,
+                amount = amount
+            )
+            splitExpenseDao.insertSplitExpense(splitExpense)
+        }
+    }
+    suspend fun insertReceipt(receipt: ReceiptEntity) {
+        withContext(Dispatchers.IO) {
+            receiptDao.insertReceipt(receipt)
+        }
+    }
+
+    // Function to get receipts for a specific expense ID
+    suspend fun getReceiptsForExpense(expenseId: Int): List<ReceiptEntity> {
+        return withContext(Dispatchers.IO) {
+            receiptDao.getReceiptsForExpense(expenseId)
+        }
     }
 }
 
