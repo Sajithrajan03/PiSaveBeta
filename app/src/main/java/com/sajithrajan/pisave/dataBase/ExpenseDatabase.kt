@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Expense::class, Category::class,TransactionEntity::class,
-        SplitExpenseEntity::class, ReceiptEntity::class],  // Include both Expense and Category entities
+        SplitExpenseEntity::class, ReceiptEntity::class,Budget::class],  // Include both Expense and Category entities
     version = 1
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -14,4 +14,5 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun splitExpenseDao(): SplitExpenseDao
     abstract fun receiptDao(): ReceiptDao
+    abstract fun budgetDao(): BudgetDao
 }

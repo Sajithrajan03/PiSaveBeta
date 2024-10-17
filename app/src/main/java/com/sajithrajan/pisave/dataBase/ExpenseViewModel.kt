@@ -210,6 +210,36 @@ class ExpenseViewModel(
     suspend fun getReceiptsForExpense(expenseId: Int): List<ReceiptEntity> {
         return repository.getReceiptsForExpense(expenseId)
     }
+    private val _monthBudget = MutableStateFlow<Budget?>(null)
+    val monthBudget: StateFlow<Budget?> get() = _monthBudget
+
+    fun getBudgetForMonth(month: String) {
+        viewModelScope.launch {
+            val budget = repository.getBudgetForMonth(month)
+            _monthBudget.value = budget
+        }
+    }
+
+    // Insert or update a budget
+    fun insertBudget(budget: Budget) {
+        viewModelScope.launch {
+            repository.insertBudget(budget)
+        }
+    }
+
+
+    private val _todaySpent = MutableStateFlow(0.0)
+    val todaySpent: StateFlow<Double> get() = _todaySpent
+
+    private val _monthSpent = MutableStateFlow(0.0)
+    val monthSpent: StateFlow<Double> get() = _monthSpent
+
+    fun fetchSpendingData() {
+        viewModelScope.launch {
+            _todaySpent.value = repository.getTodaySpent()
+            _monthSpent.value = repository.getMonthSpent()
+        }
+    }
 
 }
 

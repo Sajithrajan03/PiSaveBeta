@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
             database.categoryDao(),
             database.transactionDao(),
             database.splitExpenseDao(),
-            database.receiptDao()
+            database.receiptDao(),
+            database.budgetDao()
         )
 
         val viewModel: ExpenseViewModel by viewModels {

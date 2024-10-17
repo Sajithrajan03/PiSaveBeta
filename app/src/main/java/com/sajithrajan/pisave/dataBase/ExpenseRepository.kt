@@ -4,8 +4,16 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
-class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val categoryDAO: CategoryDAO,private val transactionDao: TransactionDao,private val splitExpenseDao: SplitExpenseDao,private val receiptDao: ReceiptDao) {
+class ExpenseRepository(private val expenseDAO: ExpenseDAO,
+                        private val categoryDAO: CategoryDAO,
+                        private val transactionDao: TransactionDao,
+                        private val splitExpenseDao: SplitExpenseDao,
+                        private val receiptDao: ReceiptDao,
+                        private val budgetDao: BudgetDao
+
+) {
 
     suspend fun upsert(expense: Expense) = expenseDAO.upsertExpense(expense)
 
@@ -111,5 +119,69 @@ class ExpenseRepository(private val expenseDAO: ExpenseDAO, private val category
             receiptDao.getReceiptsForExpense(expenseId)
         }
     }
+
+    suspend fun insertBudget(budget: Budget) {
+        withContext(Dispatchers.IO) {
+            budgetDao.insertBudget(budget)
+        }
+    }
+
+    // Fetch the budget for a given month
+    suspend fun getBudgetForMonth(month: String): Budget? {
+        return withContext(Dispatchers.IO) {
+            budgetDao.getBudgetForMonth(month)
+        }
+    }
+
+    suspend fun getTodaySpent(): Double {
+        val todayStart = getStartOfDay()
+        val todayEnd = getEndOfDay()
+        return expenseDAO.getTodaySpent(todayStart, todayEnd) ?: 0.0
+    }
+
+    suspend fun getMonthSpent(): Double {
+        val monthStart = getStartOfMonth()
+        val monthEnd = getEndOfNextMonth()
+        return expenseDAO.getMonthSpent(monthStart, monthEnd) ?: 0.0
+    }
 }
 
+
+fun getStartOfDay(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
+}
+
+fun getEndOfDay(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 23)
+    calendar.set(Calendar.MINUTE, 59)
+    calendar.set(Calendar.SECOND, 59)
+    calendar.set(Calendar.MILLISECOND, 999)
+    return calendar.timeInMillis
+}
+
+fun getStartOfMonth(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
+}
+
+fun getEndOfNextMonth(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.add(Calendar.MONTH, 1)
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
+}

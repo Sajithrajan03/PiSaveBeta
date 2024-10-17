@@ -50,3 +50,11 @@ data class ReceiptEntity(
     val expenseId: Int,
     val imageUri: String
 )
+
+@Entity(tableName = "budget")
+data class Budget(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val month: String, // Use "YYYY-MM" format to identify the month
+    val dailyBudget: Double,
+    val monthlyBudget: Double
+)

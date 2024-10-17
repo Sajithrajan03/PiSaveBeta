@@ -58,6 +58,11 @@ interface ExpenseDAO{
 
     @Update
     suspend fun updateExpense(expense: Expense)
+    @Query("SELECT SUM(amount) FROM expenses WHERE date >= :startOfDay AND date < :endOfDay")
+    suspend fun getTodaySpent(startOfDay: Long, endOfDay: Long): Double?
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE date >= :startOfMonth AND date < :endOfNextMonth")
+    suspend fun getMonthSpent(startOfMonth: Long, endOfNextMonth: Long): Double?
 }
 
 
@@ -129,4 +134,13 @@ interface ReceiptDao {
 
     @Query("SELECT * FROM receipts WHERE expenseId = :expenseId")
     suspend fun getReceiptsForExpense(expenseId: Int): List<ReceiptEntity>
+}
+
+@Dao
+interface BudgetDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBudget(budget: Budget)
+
+    @Query("SELECT * FROM budget WHERE month = :month LIMIT 1")
+    suspend fun getBudgetForMonth(month: String): Budget?
 }

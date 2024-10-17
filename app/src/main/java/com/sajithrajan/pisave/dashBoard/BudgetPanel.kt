@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,11 +45,11 @@ import kotlin.math.sin
 @Composable
 fun BudgetPanel(
     modifier: Modifier = Modifier,
-    todaySpending: Double = 30.0,
-    dailyBudget: Double = 100.0,
+    todaySpending: Double = 0.0,
+    dailyBudget: Double = 0.0,
     currency: String = "₹",
-    monthlySpending: Double = 80.0,
-    monthBudget: Double = 300.0,
+    monthlySpending: Double = 0.0,
+    monthBudget: Double = 0.0,
 ) {
     ElevatedCard() {
         Row {
@@ -218,6 +222,51 @@ fun CustomCircularProgressIndicator(
 
 
 
+@Composable
+fun BudgetDialog(
+    dailyBudgetSliderValue: Float,
+    monthlyBudgetSliderValue: Float,
+    onDailyBudgetChange: (Float) -> Unit,
+    onMonthlyBudgetChange: (Float) -> Unit,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onSave) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Set Monthly Budget") },
+        text = {
+            Column {
+                Text(text = "Daily Budget: ₹${dailyBudgetSliderValue.toInt()}", modifier = Modifier.padding(bottom = 8.dp))
+                Slider(
+                    value = dailyBudgetSliderValue,
+                    onValueChange = onDailyBudgetChange,
+                    valueRange = 100f..5000f,
+                    steps = 49,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Monthly Budget: ₹${monthlyBudgetSliderValue.toInt()}", modifier = Modifier.padding(bottom = 8.dp))
+                Slider(
+                    value = monthlyBudgetSliderValue,
+                    onValueChange = onMonthlyBudgetChange,
+                    valueRange = 1000f..100000f,
+                    steps = 99,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    )
+}
 
 
 
