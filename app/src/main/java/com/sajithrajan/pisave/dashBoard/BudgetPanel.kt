@@ -54,11 +54,11 @@ fun BudgetPanel(
     ElevatedCard() {
         Row {
             BudgetCard(
-                modifier = Modifier.weight(1f), used = todaySpending, total = dailyBudget
+                modifier = Modifier.weight(1f), used = todaySpending, total = dailyBudget,labelText = "Today"
             )
             Spacer(modifier = Modifier.width(10.dp))
             BudgetCard(
-                modifier = Modifier.weight(1f), used = monthlySpending, total = monthBudget
+                modifier = Modifier.weight(1f), used = monthlySpending, total = monthBudget, labelText = "Month"
             )
         }
     }
@@ -70,6 +70,7 @@ fun BudgetCard(
     modifier: Modifier = Modifier,
     used: Double,
     total: Double,
+    labelText: String // New parameter for label text
 ) {
     ElevatedCard(modifier = modifier) {
         Column(
@@ -79,30 +80,25 @@ fun BudgetCard(
             verticalArrangement = Arrangement.spacedBy(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-
             Text(
-                text = "Today",
+                text = labelText, // Display the label text
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 20.sp)
             )
 
-
             CustomCircularProgressIndicator(
-
-                modifier = Modifier.size(100.dp), used = used, total = total
-
-
+                modifier = Modifier.size(100.dp),
+                used = used,
+                total = total
             )
+
             Text(
-                text = String.format("%d",total.roundToInt()),
+                text = String.format("%d", total.roundToInt()),
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 30.sp),
                 modifier = Modifier.align(Alignment.End)
             )
-
         }
     }
 }
-
 
 @Composable
 fun CustomCircularProgressIndicator(
